@@ -5,7 +5,7 @@ This module contains a class for file storage
 
 import json
 import os
-from models.base_model import BaseModel
+
 
 
 class FileStorage:
@@ -31,5 +31,6 @@ class FileStorage:
         if os.path.isfile(self.__file_path):
             with open(self.__file_path, "r") as f:
                 my_objs = json.load(f)
+                from models.base_model import BaseModel
                 self.__objects = {k: BaseModel(**v)
                                   for k, v in my_objs.items()}
