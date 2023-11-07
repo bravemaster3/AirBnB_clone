@@ -5,6 +5,13 @@ This module contains a class for file storage
 
 import json
 import os
+from models.amenity import Amenity
+from models.base_model import BaseModel
+from models.city import City
+from models.place import Place
+from models.review import Review
+from models.state import State
+from models.user import User
 
 
 class FileStorage:
@@ -27,9 +34,12 @@ class FileStorage:
 
     def reload(self):
         """deserializes a json file"""
+        my_classes = {"BaseModel": BaseModel, "User": User, "Place": Place,
+                      "State": State, "City": City, "Amenity": Amenity,
+                      "Review": Review}
         if os.path.isfile(self.__file_path):
             with open(self.__file_path, "r") as f:
                 my_objs = json.load(f)
-                from models.base_model import BaseModel
-                self.__objects = {k: BaseModel(**v)
-                                  for k, v in my_objs.items()}
+                self.__objects = {k: my_classes[v['__class__']](**v)
+                                  for k, v in my_objs.items()
+                                  if v['__class__'] in my_classes.keys()}
