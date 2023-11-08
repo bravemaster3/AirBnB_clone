@@ -5,6 +5,7 @@ This program is the entry point of the command interpreter
 
 
 import cmd
+import json
 import models
 from models.base_model import BaseModel
 import re
@@ -94,7 +95,7 @@ class HBNBCommand(cmd.Cmd):
             del models.storage.all()[f"{tokens[0]}.{tokens[1]}"]
             models.storage.save()
 
-    def do_all(self, line):
+    def do_all(self, line, print_out=True, return_out=False):
         """Prints all string representation of all instances based
         or not on the class name. Ex: $ all BaseModel or $ all
         """
@@ -102,8 +103,12 @@ class HBNBCommand(cmd.Cmd):
         if not tokens:
             print([obj.__str__() for k, obj in models.storage.all().items()])
         elif self.fetch_class(tokens[0]) is not False:
-            print([obj.__str__() for k, obj in models.storage.all().items() if
-                   obj.__class__.__name__ == tokens[0]])
+            ret = [obj.__str__() for k, obj in models.storage.all().items() if
+                   obj.__class__.__name__ == tokens[0]]
+            if print_out:
+                print(ret)
+            if return_out:
+                return ret
         else:
             print("** class doesn't exist **")
 
@@ -128,6 +133,43 @@ class HBNBCommand(cmd.Cmd):
                 setattr(models.storage.all()[mod_id],
                         tokens[2], var_type(tokens[3]))
             models.storage.save()
+
+    def default(self, line: str) -> None:
+        """"Overrides the default behaviour of the cmd line for unknown cmd
+        """
+        token = self.magic_splitter(line)
+        toks = token[0].split(".")
+        cls_list = [BaseModel] + BaseModel.__subclasses__()
+        cls_names = [cls.__name__ for cls in cls_list]
+        met_list1 = ["all()", "count()"]
+        if len(toks) == 2:
+            command = toks[1].split("(")[0]
+            arg = toks[1].split("(")[1].split(")")[0]
+        if len(toks) == 2 and toks[0] in cls_names and toks[1] in met_list1:
+            all_obj = self.do_all(
+                toks[0], print_out=False, return_out=True)
+            if toks[1] == "all()":
+                print('[' + ', '.join(all_obj) + ']')
+            if toks[1] == "count()":
+                print(len(all_obj))
+        elif len(toks) == 2 and toks[0] in cls_names and command == "show":
+            self.do_show(f"{toks[0]} {arg}")
+        elif len(toks) == 2 and toks[0] in cls_names and command == "destroy":
+            self.do_destroy(f"{toks[0]} {arg}")
+        elif len(toks) == 2 and toks[0] in cls_names and command == "update":
+            arg = line.split(")")[0].split("(")[1]
+            """FAILED ATTEMPT TO DO TASK 16... COMBINED WITH 15.
+            spl = arg.split(", ")
+            if len(spl) >= 2 and type(json.loads(spl[1])) is dict:
+                print(spl)
+                for name, value in json.loads(spl[1]).items():
+                    self.do_update(f"{toks[0]} {name} {value}")
+            else:
+                self.do_update(f"{toks[0]} {arg.replace(',', '')}")
+            """
+            self.do_update(f"{toks[0]} {arg.replace(',', '')}")
+        else:
+            return super().default(line)
 
     def emptyline(self):
         """Defines what happens when no command is issued
