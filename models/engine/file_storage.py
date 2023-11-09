@@ -38,10 +38,7 @@ class FileStorage:
         return {c.__name__:c for c in classes}
 
     def reload(self):
-        """deserializes a json file"""
-        """my_classes = {"BaseModel": BaseModel, "User": User, "Place": Place,
-                      "State": State, "City": City, "Amenity": Amenity,
-                      "Review": Review}"""
+        """deserializes a json file"""        
         my_classes = self.all_classes(BaseModel)
         if os.path.isfile(self.__file_path):
             with open(self.__file_path, "r") as f:
