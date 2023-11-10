@@ -31,15 +31,18 @@ class FileStorage:
         """"serializes and saves __objects"""
         with open(self.__file_path, "w") as f:
             json.dump({k: v.to_dict() for k, v in self.__objects.items()}, f)
+    
+    def all_classes(self, cls):
+        """Return a dictionary of parent class and all dirrect subclasses"""
+        classes = set([cls]).union(cls.__subclasses__())
+        return {c.__name__:c for c in classes}
 
     def reload(self):
-        """deserializes a json file"""
-        my_classes = {"BaseModel": BaseModel, "User": User, "Place": Place,
-                      "State": State, "City": City, "Amenity": Amenity,
-                      "Review": Review}
+        """deserializes a json file"""        
+        my_classes = self.all_classes(BaseModel)
         if os.path.isfile(self.__file_path):
             with open(self.__file_path, "r") as f:
                 my_objs = json.load(f)
                 self.__objects = {k: my_classes[v['__class__']](**v)
                                   for k, v in my_objs.items()
-                                  if v['__class__'] in my_classes.keys()}
+                                  if v['__class__'] in my_classes}
