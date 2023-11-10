@@ -10,15 +10,12 @@ from models.base_model import BaseModel
 import re
 import shlex
 from ast import literal_eval
-# from models.engine import file_storage
-# ^(\"[^\"]*\")(?:, (.*))?$ matches attr and dict
-# ^({.*})$ dictionary only
 
 
 class HBNBCommand(cmd.Cmd):
     """definition of the CLI class"""
     prompt = "(hbnb) "
-
+    __from_match = False
 
     def fetch_class(self, name):
         """returns a class given its name as string"""
@@ -42,7 +39,7 @@ class HBNBCommand(cmd.Cmd):
         elif argc >= 2 and not storage.all().get(f"{args[0]}.{args[1]}"):
             print("** no instance found **")
             err = True
-        elif argc >=3 and len(args) == 2:
+        elif argc >= 3 and len(args) == 2:
             print("** attribute name missing **")
             err = True
         elif argc > 3 and len(args) == 3:
@@ -50,11 +47,9 @@ class HBNBCommand(cmd.Cmd):
             err = True
         return err, args
 
-
     def magic_splitter(self, string):
         """splits a string without splitting double quote content"""
         return shlex.split(string)
-
 
     def do_create(self, line):
         """Creates a new instance of Basemodel, saves it to the JSON file,
@@ -93,12 +88,16 @@ class HBNBCommand(cmd.Cmd):
         if not err:
             all_objects = [obj for k, obj in storage.all().items()]
             if tokens:
-                all_objects = [obj for obj in all_objects if obj.__class__.__name__ == tokens[0]]
+                all_objects = [obj for obj in all_objects
+                               if obj.__class__.__name__ == tokens[0]]
             if count:
                 return len(all_objects)
-            print([obj.__str__() for obj in all_objects])
 
-
+            ret_obj_str = [obj.__str__() for obj in all_objects]
+            if self.__from_match:
+                print("[" + ", ".join(ret_obj_str) + "]")
+            else:
+                print(ret_obj_str)
 
     def do_update(self, line):
         """Updates an instance based on the class name and id by adding
@@ -111,76 +110,79 @@ class HBNBCommand(cmd.Cmd):
             instance = storage.all().get(instance_id)
             attr_value = getattr(instance, tokens[2], None)
             attr_type = type(attr_value) if attr_value is not None else None
-            cast_attr_value = self.cast_attr(tokens[3], attr_type)
-            setattr(instance, tokens[2], cast_attr_value)
+
+            if attr_type:
+                new_value = attr_type(tokens[3])
+            else:
+                new_value = self.cast_attr(tokens[3])
+            setattr(instance, tokens[2], new_value)
             storage.save()
 
-    def cast_attr(self, attr_value, _type=None):
-        """Cast value to desired type"""
-
-        if _type is not None:
-            try:
-                _type(attr_value)
-                return _type(attr_value)
-            except:
-                if _type == int:
-                    try:
-                        _type(float(attr_value))
-                        return _type(float(attr_value))
-                    except:
-                        pass
+    def cast_attr(self, value, data_type=None):
+        """Cast value to exisiting data type or
+        cast to appropriate data type"""
         try:
-            if "." in attr_value:
-                float(attr_value)
-                return float(attr_value)
-            int(attr_value)
-            return int(attr_value)
-        except:
-            pass
-        return attr_value
-
-    def map_method(self, name, line):
-        """find methods currently in class"""        
-        my_method = getattr(self, name, None)
-        if callable(my_method):
-            my_method(line)
+            if data_type is not None:
+                return data_type(value)
+            elif "." in value:
+                return float(value)
+            else:
+                return int(value)
+        except (ValueError, TypeError) as e:
+            if data_type and data_type == int:
+                try:
+                    return data_type(float(value))
+                except:
+                    pass
+            elif not data_type:
+                return value
+            else:
+                pass
 
     def default(self, line: str) -> None:
         """Override the default"""
-        """Still a working progress"""
-        match = re.search(r"^(\w*)\.(\w+)(?:\(([^)]*)\)?)$", line)
+        allowed_methods = ["all", "count", "destroy", "show", "update"]
+        match = re.search(r"^(\w*)\.(\w+)(?:\(([^)]*)\)?).*$", line)
 
         if match:
-            my_dict = None
             class_name, method_name, args = match.groups()
-            method_name = method_name if method_name == "count" else "do_" + method_name
 
+        if match and method_name in allowed_methods:
             dict_matched = re.search(r'^(\"[^\"]*\"), ({.*})$', args)
+
             if dict_matched:
-                instance_id, my_dict_str = dict_matched.groups()
-                my_dict = literal_eval(my_dict_str)
-                if isinstance(my_dict, dict):
-                    # print(my_dict)
-                    my_dict_str = my_dict_str.strip("{}")
-                    dict_str_list = [item for substring in my_dict_str.split(",") for item in substring.split(":")]
-                    i = 0
-                    for  j in range(1, len(dict_str_list), 2):
-                        new_line = " ".join([class_name, instance_id, dict_str_list[i] , dict_str_list[j]])
-                        self.map_method(method_name, new_line)
-                        i += 2
+                instance_id, dict_str = dict_matched.groups()
 
+                if isinstance(literal_eval(dict_str), dict):
+                    dict_str = dict_str.strip("{}")
+                    dict_list = [item for substring in dict_str.split(",")
+                                 for item in substring.split(":")]
+                    for j in range(0, len(dict_list), 2):
+                        new_line = " ".join([method_name, class_name,
+                                             instance_id, dict_list[j],
+                                             dict_list[j+1]])
+                        self._exec_cmd(new_line)
             else:
-                args = args.replace("'", " ").split(",")
-                arg_line = " ".join(args)
-                new_line = " ". join([class_name, arg_line])
-                self.map_method(method_name, new_line)
-
+                # arg_line = " ".join(args.split(","))
+                arg_line = " ".join(args.replace("'", " ").split(","))
+                cmd_args = " ". join([class_name, arg_line])
+                if method_name == "count":
+                    self.count(cmd_args)
+                else:
+                    new_line = " ".join([method_name, cmd_args])
+                    self._exec_cmd(new_line)
         else:
             return super().default(line)
 
-    def count(self, line):
-        print(self.do_all(line, True))
+    def _exec_cmd(self, line):
+        """Execute commands"""
+        self.__from_match = True
+        self.onecmd(line)
+        self.__from_match = False
 
+    def count(self, line):
+        """Return number of instances"""
+        print(self.do_all(line, True))
 
     def emptyline(self):
         """Defines what happens when no command is issued
