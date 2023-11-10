@@ -16,8 +16,8 @@ from models.user import User
 
 class FileStorage:
     """Definition of the class FileStorage"""
-    __file_path = "file.json"
-    __objects = {}
+    __file_path: str = "file.json"
+    __objects: dict = {}
 
     def all(self):
         """returns all objects"""
