@@ -5,171 +5,184 @@ This program is the entry point of the command interpreter
 
 
 import cmd
-import json
-import models
+from models import storage
 from models.base_model import BaseModel
 import re
-# from models.engine import file_storage
+import shlex
+from ast import literal_eval
 
 
 class HBNBCommand(cmd.Cmd):
     """definition of the CLI class"""
     prompt = "(hbnb) "
+    __from_match = False
 
     def fetch_class(self, name):
         """returns a class given its name as string"""
-        if name in [cls.__name__ for cls in [BaseModel] +
-                    BaseModel.__subclasses__()]:
-            my_class = [cls for cls in [BaseModel] +
-                        BaseModel.__subclasses__()
-                        if name == cls.__name__][0]
-            return my_class
-        else:
-            return False
+        return storage.all_classes(BaseModel).get(name)
 
-    def handle_errors(self, line, crud="RD"):
-        """generic error handler"""
-        if line == "":
+    def my_handler(self, line, argc=1, all=False):
+        """Splits line into arguments
+        Runs checks on the arguments
+        Returns tuple of error flag and list of arguments"""
+        args = self.magic_splitter(line)
+        err = False
+        if not args and not all:
             print("** class name missing **")
-            return -1
-        else:
-            tokens = self.magic_splitter(line)
-            if self.fetch_class(tokens[0]) is False:
-                print("** class doesn't exist **")
-                return -1
-            elif crud == "RD" or crud == "U":
-                if len(tokens) == 1:
-                    print("** instance id missing **")
-                    return -1
-                if len(tokens) > 1:
-                    mod_id = f"{tokens[0]}.{tokens[1]}"
-                    if mod_id not in models.storage.all():
-                        print("** no instance found **")
-                        return -1
-                if crud == "U":
-                    if len(tokens) == 2:
-                        print("** attribute name missing **")
-                        return -1
-                    if len(tokens) == 3:
-                        print("** value missing **")
-                        return -1
+            err = True
+        elif args and not self.fetch_class(args[0]):
+            print("** class doesn't exist **")
+            err = True
+        elif argc >= 2 and len(args) == 1:
+            print("** instance id missing **")
+            err = True
+        elif argc >= 2 and not storage.all().get(f"{args[0]}.{args[1]}"):
+            print("** no instance found **")
+            err = True
+        elif argc >= 3 and len(args) == 2:
+            print("** attribute name missing **")
+            err = True
+        elif argc > 3 and len(args) == 3:
+            print("** value missing **")
+            err = True
+        return err, args
 
     def magic_splitter(self, string):
         """splits a string without splitting double quote content"""
-        result = re.findall(r'[^"\s]+|"[^"]*"', string)
-        result = [
-            x.strip('"') if x.startswith('"') and x.endswith('"') else x
-            for x in result
-        ]
-        return result
+        return shlex.split(string)
 
     def do_create(self, line):
         """Creates a new instance of Basemodel, saves it to the JSON file,
         and prints the id. Eg: create BaseModel
         """
-        err = self.handle_errors(line, crud="C")
-        tokens = self.magic_splitter(line)
-        if err != -1 and self.fetch_class(tokens[0]) is not False:
+        err, tokens = self.my_handler(line)
+        if not err and self.fetch_class(tokens[0]):
             my_class = self.fetch_class(tokens[0])
-            my_obj = my_class()
-            print(my_obj.id)
-            my_obj.save()
+            my_object = my_class()
+            print(my_object.id)
+            my_object.save()
 
     def do_show(self, line):
         """Prints the string representation of an instance based on
         the class name and id. Ex: $ show BaseModel 1234-1234-1234
         """
-        err = self.handle_errors(line, crud="RD")
-        if err != -1:
-            tokens = self.magic_splitter(line)
-            print(models.storage.all()[f"{tokens[0]}.{tokens[1]}"])
+        err, tokens = self.my_handler(line, 2)
+        if not err:
+            print(storage.all().get(f"{tokens[0]}.{tokens[1]}"))
 
     def do_destroy(self, line):
         """Deletes an instance based on the class name and id,
         save the change into the JSON file.
         Ex: $ destroy BaseModel 1234-1234-1234
         """
-        err = self.handle_errors(line, crud="RD")
-        if err != -1:
-            tokens = self.magic_splitter(line)
-            del models.storage.all()[f"{tokens[0]}.{tokens[1]}"]
-            models.storage.save()
+        err, tokens = self.my_handler(line, 2)
+        if not err:
+            del storage.all()[f"{tokens[0]}.{tokens[1]}"]
+            storage.save()
 
-    def do_all(self, line, print_out=True, return_out=False):
+    def do_all(self, line, count=False):
         """Prints all string representation of all instances based
         or not on the class name. Ex: $ all BaseModel or $ all
         """
-        tokens = self.magic_splitter(line)
-        if not tokens:
-            print([obj.__str__() for k, obj in models.storage.all().items()])
-        elif self.fetch_class(tokens[0]) is not False:
-            ret = [obj.__str__() for k, obj in models.storage.all().items() if
-                   obj.__class__.__name__ == tokens[0]]
-            if print_out:
-                print(ret)
-            if return_out:
-                return ret
-        else:
-            print("** class doesn't exist **")
+        err, tokens = self.my_handler(line, all=True)
+        if not err:
+            all_objects = [obj for k, obj in storage.all().items()]
+            if tokens:
+                all_objects = [obj for obj in all_objects
+                               if obj.__class__.__name__ == tokens[0]]
+            if count:
+                return len(all_objects)
+
+            ret_obj_str = [obj.__str__() for obj in all_objects]
+            if self.__from_match:
+                print("[" + ", ".join(ret_obj_str) + "]")
+            else:
+                print(ret_obj_str)
 
     def do_update(self, line):
         """Updates an instance based on the class name and id by adding
         or updating attribute (save the change into the JSON file).
         Ex: $ update BaseModel 1234-1234-1234 email "aibnb@mail.com"
         """
-        err = self.handle_errors(line, crud="U")
-        if err != -1:
-            tokens = self.magic_splitter(line)
-            mod_id = f"{tokens[0]}.{tokens[1]}"
-            var_type = None
-            if hasattr(models.storage.all()[mod_id], tokens[2]):
-                var_type = type(getattr(
-                    models.storage.all()[mod_id], tokens[2]))
+        err, tokens = self.my_handler(line, 4)
+        if not err:
+            instance_id = f"{tokens[0]}.{tokens[1]}"
+            instance = storage.all().get(instance_id)
+            attr_value = getattr(instance, tokens[2], None)
+            attr_type = type(attr_value) if attr_value is not None else None
 
-            if not var_type:
-                setattr(models.storage.all()[mod_id],
-                        tokens[2], tokens[3])
+            if attr_type:
+                new_value = attr_type(tokens[3])
             else:
-                setattr(models.storage.all()[mod_id],
-                        tokens[2], var_type(tokens[3]))
-            models.storage.save()
+                new_value = self.cast_attr(tokens[3])
+            setattr(instance, tokens[2], new_value)
+            storage.save()
+
+    def cast_attr(self, value, data_type=None):
+        """Cast value to exisiting data type or
+        cast to appropriate data type"""
+        try:
+            if data_type is not None:
+                return data_type(value)
+            elif "." in value:
+                return float(value)
+            else:
+                return int(value)
+        except (ValueError, TypeError) as e:
+            if data_type and data_type == int:
+                try:
+                    return data_type(float(value))
+                except:
+                    pass
+            elif not data_type:
+                return value
+            else:
+                pass
 
     def default(self, line: str) -> None:
-        """"Overrides the default behaviour of the cmd line for unknown cmd
-        """
-        token = self.magic_splitter(line)
-        toks = token[0].split(".")
-        cls_list = [BaseModel] + BaseModel.__subclasses__()
-        cls_names = [cls.__name__ for cls in cls_list]
-        met_list1 = ["all()", "count()"]
-        if len(toks) == 2:
-            command = toks[1].split("(")[0]
-            arg = toks[1].split("(")[1].split(")")[0]
-        if len(toks) == 2 and toks[0] in cls_names and toks[1] in met_list1:
-            all_obj = self.do_all(
-                toks[0], print_out=False, return_out=True)
-            if toks[1] == "all()":
-                print('[' + ', '.join(all_obj) + ']')
-            if toks[1] == "count()":
-                print(len(all_obj))
-        elif len(toks) == 2 and toks[0] in cls_names and command == "show":
-            self.do_show(f"{toks[0]} {arg}")
-        elif len(toks) == 2 and toks[0] in cls_names and command == "destroy":
-            self.do_destroy(f"{toks[0]} {arg}")
-        elif len(toks) == 2 and toks[0] in cls_names and command == "update":
-            arg = line.split(")")[0].split("(")[1]
-            """FAILED ATTEMPT TO DO TASK 16... COMBINED WITH 15.
-            spl = arg.split(", ")
-            if len(spl) >= 2 and type(json.loads(spl[1])) is dict:
-                print(spl)
-                for name, value in json.loads(spl[1]).items():
-                    self.do_update(f"{toks[0]} {name} {value}")
+        """Override the default"""
+        allowed_methods = ["all", "count", "destroy", "show", "update"]
+        match = re.search(r"^(\w*)\.(\w+)(?:\(([^)]*)\)?).*$", line)
+
+        if match:
+            class_name, method_name, args = match.groups()
+
+        if match and method_name in allowed_methods:
+            dict_matched = re.search(r'^(\"[^\"]*\"), ({.*})$', args)
+
+            if dict_matched:
+                instance_id, dict_str = dict_matched.groups()
+
+                if isinstance(literal_eval(dict_str), dict):
+                    dict_str = dict_str.strip("{}")
+                    dict_list = [item for substring in dict_str.split(",")
+                                 for item in substring.split(":")]
+                    for j in range(0, len(dict_list), 2):
+                        new_line = " ".join([method_name, class_name,
+                                             instance_id, dict_list[j],
+                                             dict_list[j+1]])
+                        self._exec_cmd(new_line)
             else:
-                self.do_update(f"{toks[0]} {arg.replace(',', '')}")
-            """
-            self.do_update(f"{toks[0]} {arg.replace(',', '')}")
+                # arg_line = " ".join(args.split(","))
+                arg_line = " ".join(args.replace("'", " ").split(","))
+                cmd_args = " ". join([class_name, arg_line])
+                if method_name == "count":
+                    self.count(cmd_args)
+                else:
+                    new_line = " ".join([method_name, cmd_args])
+                    self._exec_cmd(new_line)
         else:
             return super().default(line)
+
+    def _exec_cmd(self, line):
+        """Execute commands"""
+        self.__from_match = True
+        self.onecmd(line)
+        self.__from_match = False
+
+    def count(self, line):
+        """Return number of instances"""
+        print(self.do_all(line, True))
 
     def emptyline(self):
         """Defines what happens when no command is issued
