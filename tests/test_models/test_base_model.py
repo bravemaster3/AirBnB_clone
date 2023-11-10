@@ -3,14 +3,13 @@
 Unittest class for base_model
 """
 
-# from models import base_model
 import os
 import unittest
-from importlib import reload
 from models.base_model import BaseModel
 from datetime import datetime
 from io import StringIO
 import sys
+from models import storage
 
 
 class TestBaseModel(unittest.TestCase):
@@ -20,6 +19,9 @@ class TestBaseModel(unittest.TestCase):
         """removing file.json to start from empty"""
         # reload(base_model)
         stor_path = "file.json"
+        with open(stor_path, "w") as f:
+            f.write("{}")
+        storage.reload()
         if os.path.exists(stor_path):
             os.remove(stor_path)
 
@@ -32,7 +34,17 @@ class TestBaseModel(unittest.TestCase):
             os.remove(stor_path)
 
     def setUp(self):
+        """creating a BaseModel before each test case"""
         self.obj = BaseModel()
+
+    def tearDown(self):
+        """Instructions to do after each test"""
+        stor_path = "file.json"
+        with open(stor_path, "w") as f:
+            f.write("{}")
+        storage.reload()
+        if os.path.exists(stor_path):
+            os.remove(stor_path)
 
     def stdout_capturer(self, method_to_run, *args, **kwargs):
         """method for capturing stdout"""
@@ -58,8 +70,6 @@ class TestBaseModel(unittest.TestCase):
         self.assertTrue(set({'a_dict': subset}).issubset(
             set(self.obj.__dict__)))
         self.assertIsNone(self.obj.none_var)
-
-        # self.obj.__dict__, self.obj.__dict__ | {'a_dict': subset})
 
     def test_str_print(self):
         """testing the return of str"""
@@ -101,7 +111,12 @@ class TestBaseModel(unittest.TestCase):
         dict_obj = self.obj.to_dict()
         obj2 = BaseModel(**dict_obj)
         self.assertEqual(self.obj.__str__(), obj2.__str__())
-        self.assertFalse(hasattr(obj2.__dict__, "__class__"))
+        self.assertIsNone(obj2.__dict__.get("__class__"))
+        self.assertTrue(type(obj2.__dict__.get("created_at")) is datetime)
+        self.assertTrue(type(obj2.__dict__.get("updated_at")) is datetime)
+        self.assertTrue(hasattr(obj2, "my_number"))
+        obj3 = BaseModel(**{})
+        self.assertTrue(hasattr(obj3, "id"))
 
 
 if __name__ == '__main__':
