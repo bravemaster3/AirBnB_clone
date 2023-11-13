@@ -5,6 +5,7 @@ Unittest class for base_model
 
 import os
 import unittest
+import models
 from models import base_model
 from models.base_model import BaseModel
 from models.user import User
@@ -111,22 +112,22 @@ class TestFileStorage(unittest.TestCase):
             my_bm = BaseModel()
             my_us = User()
             
-            storage.new(my_bm)
-            storage.new(my_us)
+            models.storage.new(my_bm)
+            models.storage.new(my_us)
             
-            self.assertIn("BaseModel." + my_bm.id, storage.all().keys())
-            self.assertIn(my_bm, storage.all().values())
-            self.assertIn("User." + my_us.id, storage.all().keys())
-            self.assertIn(my_us, storage.all().values())
+            self.assertIn("BaseModel." + my_bm.id, models.storage.all().keys())
+            self.assertIn(my_bm, models.storage.all().values())
+            self.assertIn("User." + my_us.id, models.storage.all().keys())
+            self.assertIn(my_us, models.storage.all().values())
             
 
         def test_save(self):
             """Test the .save() method"""
             my_bm = BaseModel()
             my_us = User()
-            storage.new(my_bm)
+            models.storage.new(my_bm)
             """storage.new(my_us)"""
-            storage.save()
+            models.storage.save()
             save_text = ""
             with open("file.json", "r") as f:
                 save_text = f.read()
