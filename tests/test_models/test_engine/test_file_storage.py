@@ -61,9 +61,14 @@ class TestFileStorage(unittest.TestCase):
     def test_storage_new(self):
         """testing addition of a new object to the storage"""
         obj2 = BaseModel()
+        obj3 = User()
         all_objs = storage.all()
         key = f"BaseModel.{obj2.id}"
-        self.assertTrue(key in all_objs)
+        key2 = f"User.{obj3.id}"
+        with self.subTest():
+            self.assertTrue((key, obj2) in all_objs.items())
+        with self.subTest():
+            self.assertTrue((key, obj3) in all_objs.items())
 
     def test_storage_save_reload(self):
         """testing save and reload methods"""
@@ -84,13 +89,12 @@ class TestFileStorage(unittest.TestCase):
         us = User()
         # storage.new(us)
         self.assertIn("User." + us.id, storage.all().keys())
-        self.assertIn(us, storage.all().values())"""
+        self.assertIn(us, storage.all().values())
     def test_child_storage_new(self):
-        """testing addition of a new subclass object to the storage"""
         obj3 = User()
         all_objs = storage.all()
         key = f"User.{obj3.id}"
-        self.assertTrue((key, obj3) in all_objs.items())
+        self.assertTrue((key, obj3) in all_objs.items())"""
 
     """def test_child_save(self):
         
