@@ -13,6 +13,11 @@ from datetime import datetime
 from time import sleep
 from models.base_model import BaseModel
 from models.user import User
+from models.state import State
+from models.place import Place
+from models.city import City
+from models.amenity import Amenity
+from models.review import Review
 
 
 """class TestBaseModel_instantiation(unittest.TestCase):
@@ -116,11 +121,29 @@ class TestBaseModel_save(unittest.TestCase):
             self.assertIn(bmid, f.read())
 
     def test_save_child_updates_file(self):
-        bm = User()
-        bm.save()
-        bmid = "User." + bm.id
+        bm = BaseModel()
+        us = User()
+        st = State()
+        pl = Place()
+        cy = City()
+        am = Amenity()
+        rv = Review()
+        us.save()
+        st.save()
+        pl.save()
+        cy.save()
+        am.save()
+        rv.save()
+        save_text = ""
         with open("file.json", "r") as f:
-            self.assertIn(bmid, f.read())
+            save_text = f.read()
+            self.assertIn("BaseModel." + bm.id, save_text)
+            self.assertIn("User." + us.id, save_text)
+            self.assertIn("State." + st.id, save_text)
+            self.assertIn("Place." + pl.id, save_text)
+            self.assertIn("City." + cy.id, save_text)
+            self.assertIn("Amenity." + am.id, save_text)
+            self.assertIn("Review." + rv.id, save_text)
 
 
 """class TestBaseModel_to_dict(unittest.TestCase):
