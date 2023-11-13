@@ -1,163 +1,118 @@
 #!/usr/bin/python3
-'''
-Module
-'''
+""" unit test for bases """
+import json
 import unittest
-from models.engine.file_storage import FileStorage
 from models.base_model import BaseModel
+from datetime import datetime
 import models
+from io import StringIO
+import sys
+from unittest.mock import patch
+captured_output = StringIO()
+sys.stdout = captured_output
 
 
-class TestFileStorage(unittest.TestCase):
-    '''
-    Docs
-    '''
+class BaseModelTestCase(unittest.TestCase):
+    """ class for base test """
 
-    def test_moduleDocs(self):
-        '''
-        Docs
-        '''
-        moduleDoc = (
-                __import__("models.engine.file_storage")
-                .engine.file_storage.__doc__)
-        self.assertGreater(len(moduleDoc), 0)
+    def setUp(self):
+        """ class for base test """
+        self.filepath = models.storage._FileStorage__file_path
+        with open(self.filepath, 'w') as file:
+            file.truncate(0)
+        models.storage.all().clear()
 
-    def test_classDocs(self):
-        '''
-        Docs
-        '''
-        classDoc = (
-                __import__("models.engine.file_storage")
-                .engine.file_storage.FileStorage.__doc__)
-        self.assertGreater(len(classDoc), 0)
+    def tearDown(self):
+        """ class for base test """
+        printed_output = captured_output.getvalue()
+        sys.stdout = sys.__stdout__
 
-    def test_methodDocsSave(self):
-        '''
-        Docs
-        '''
-        methodDoc = (
-                __import__("models.engine.file_storage")
-                .engine.file_storage.FileStorage.save.__doc__)
-        self.assertGreater(len(methodDoc), 0)
+    def test_basemodel_init(self):
+        """ class for base test """
+        new = BaseModel()
 
-    def test_methodDocsNew(self):
-        '''
-        Docs
-        '''
-        methodDoc = (
-                __import__("models.engine.file_storage")
-                .engine.file_storage.FileStorage.new.__doc__)
-        self.assertGreater(len(methodDoc), 0)
+        """ check if it have methods """
+        self.assertTrue(hasattr(new, "__init__"))
+        self.assertTrue(hasattr(new, "__str__"))
+        self.assertTrue(hasattr(new, "save"))
+        self.assertTrue(hasattr(new, "to_dict"))
 
-    def test_methodDocsAll(self):
-        '''
-        Docs
-        '''
-        methodDoc = (
-                __import__("models.engine.file_storage")
-                .engine.file_storage.FileStorage.all.__doc__)
-        self.assertGreater(len(methodDoc), 0)
+        """existince"""
+        self.assertTrue(hasattr(new, "id"))
+        self.assertTrue(hasattr(new, "created_at"))
+        self.assertTrue(hasattr(new, "updated_at"))
 
-    def test_methodDocsReload(self):
-        '''
-        Docs
-        '''
-        methodDoc = (
-                __import__("models.engine.file_storage")
-                .engine.file_storage.FileStorage.reload.__doc__)
-        self.assertGreater(len(methodDoc), 0)
+        """type test"""
+        self.assertIsInstance(new.id, str)
+        self.assertIsInstance(new.created_at, datetime)
+        self.assertIsInstance(new.updated_at, datetime)
 
-    def test_file_path_Type(self):
-        '''
-        Docs
-        '''
-        self.assertIs(type(FileStorage._FileStorage__file_path), str)
+        """ check if save in storage """
+        keyname = "BaseModel."+new.id
+        """ check if object exist by keyname """
+        self.assertIn(keyname, models.storage.all())
+        """ check if the object found in storage with corrrect id"""
+        self.assertTrue(models.storage.all()[keyname] is new)
 
-    def test_objects_Type(self):
-        '''
-        Docs
-        '''
-        self.assertIs(type(FileStorage._FileStorage__objects), dict)
+        """ Test update """
+        new.name = "My First Model"
+        new.my_number = 89
+        self.assertTrue(hasattr(new, "name"))
+        self.assertTrue(hasattr(new, "my_number"))
+        self.assertTrue(hasattr(models.storage.all()[keyname], "name"))
+        self.assertTrue(hasattr(models.storage.all()[keyname], "my_number"))
 
-    def test_file_path(self):
-        '''
-        Docs
-        '''
-        file_storage = FileStorage()
-        self.assertEqual(file_storage._FileStorage__file_path, "file.json")
+        """check if save() update update_at time change"""
+        old_time = new.updated_at
+        new.save()
+        self.assertNotEqual(old_time, new.updated_at)
+        self.assertGreater(new.updated_at, old_time)
 
-    def test_objects(self):
-        '''
-        Docs
-        '''
-        file_storage = FileStorage()
-        file_storage._FileStorage__objects = {}
-        self.assertEqual(file_storage._FileStorage__objects, {})
-        obj = BaseModel()
-        file_storage.new(obj)
-        objects = file_storage.all()
-        self.assertIn("BaseModel.{}".format(obj.id), objects)
-        self.assertEqual(objects["BaseModel.{}".format(obj.id)], obj)
+        """ check if init it call: models.storage.save() """
+        with patch('models.storage.save') as mock_function:
+            obj = BaseModel()
+            obj.save()
+            mock_function.assert_called_once()
 
-    def test_method_all(self):
-        '''
-        Docs
-        '''
-        file_storage = FileStorage()
-        objects = file_storage.all()
-        self.assertEqual(objects, file_storage._FileStorage__objects)
+        """check if it save in json file"""
+        keyname = "BaseModel."+new.id
+        with open(self.filepath, 'r') as file:
+            saved_data = json.load(file)
+        """ check if object exist by keyname """
+        self.assertIn(keyname, saved_data)
+        """ check if the value found in json is correct"""
+        self.assertEqual(saved_data[keyname], new.to_dict())
 
-    def test_method_new(self):
-        '''
-        Docs
-        '''
-        file_storage = FileStorage()
-        obj1 = BaseModel()
-        obj2 = BaseModel()
+    def test_basemodel_init2(self):
+        """ class for base test """
 
-        file_storage.new(obj1)
-        file_storage.new(obj2)
+        new = BaseModel()
+        new.name = "John"
+        new.my_number = 89
+        new2 = BaseModel(**new.to_dict())
+        self.assertEqual(new.id, new2.id)
+        self.assertEqual(new.name, "John")
+        self.assertEqual(new.my_number, 89)
+        self.assertEqual(new.to_dict(), new2.to_dict())
 
-        self.assertIn(
-                "BaseModel.{}".format(obj1.id),
-                file_storage._FileStorage__objects)
-        self.assertIn(
-                "BaseModel.{}".format(obj2.id),
-                file_storage._FileStorage__objects)
+    def test_basemodel_init3(self):
+        """ DOC DOC DOC """
+        new = BaseModel()
+        new2 = BaseModel(new.to_dict())
+        self.assertNotEqual(new, new2)
+        self.assertNotEqual(new.id, new2.id)
+        self.assertTrue(isinstance(new2.created_at, datetime))
+        self.assertTrue(isinstance(new2.updated_at, datetime))
+
+        new = BaseModel()
 
         self.assertEqual(
-                file_storage._FileStorage__objects[
-                    "BaseModel.{}".format(obj1.id)], obj1)
-        self.assertEqual(
-                file_storage._FileStorage__objects[
-                    "BaseModel.{}".format(obj2.id)], obj2)
+            str(new),  "[BaseModel] ({}) {}".format(new.id, new.__dict__))
 
-    def test_method_save(self):
-        '''
-        Docs
-        '''
-        file_storage = FileStorage()
-        obj1 = BaseModel()
-
-        file_storage.save()
-
-        with open("file.json", "r") as f:
-            json_string = f.read()
-
-        self.assertIn("BaseModel.{}".format(obj1.id), json_string)
-
-    def test_method_reload(self):
-        '''
-        Docs
-        '''
-        file_storage = FileStorage()
-        base_model = BaseModel()
-        file_storage.save()
-        models.storage.reload()
-        objects = file_storage._FileStorage__objects
-
-        self.assertIn("BaseModel.{}".format(base_model.id), objects)
+        old_time = new.updated_at
+        new.save()
+        self.assertGreater(new.updated_at, old_time)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     unittest.main()
