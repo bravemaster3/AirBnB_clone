@@ -8,6 +8,11 @@ import unittest
 from models import base_model
 from models.base_model import BaseModel
 from models.user import User
+from models.state import State
+from models.place import Place
+from models.city import City
+from models.amenity import Amenity
+from models.review import Review
 from models.engine import file_storage
 from models import storage
 from datetime import datetime
@@ -105,12 +110,32 @@ class TestFileStorage(unittest.TestCase):
             """Test the .new() method"""
             my_bm = BaseModel()
             my_us = User()
+            st = State()
+            pl = Place()
+            cy = City()
+            am = Amenity()
+            rv = Review()
             storage.new(my_bm)
             storage.new(my_us)
+            storage.new(st)
+            storage.new(pl)
+            storage.new(cy)
+            storage.new(am)
+            storage.new(rv)
             self.assertIn("BaseModel." + my_bm.id, storage.all().keys())
             self.assertIn(my_bm, storage.all().values())
             self.assertIn("User." + my_us.id, storage.all().keys())
             self.assertIn(my_us, storage.all().values())
+            self.assertIn("State." + st.id, storage.all().keys())
+            self.assertIn(st, storage.all().values())
+            self.assertIn("Place." + pl.id, storage.all().keys())
+            self.assertIn(pl, storage.all().values())
+            self.assertIn("City." + cy.id, storage.all().keys())
+            self.assertIn(cy, storage.all().values())
+            self.assertIn("Amenity." + am.id, storage.all().keys())
+            self.assertIn(am, storage.all().values())
+            self.assertIn("Review." + rv.id, storage.all().keys())
+            self.assertIn(rv, storage.all().values())
 
         def test_save(self):
             """Test the .save() method"""
