@@ -12,6 +12,7 @@ import unittest
 from datetime import datetime
 from time import sleep
 from models.base_model import BaseModel
+from models.user import User
 
 
 """class TestBaseModel_instantiation(unittest.TestCase):
@@ -111,6 +112,13 @@ class TestBaseModel_save(unittest.TestCase):
         bm = BaseModel()
         bm.save()
         bmid = "BaseModel." + bm.id
+        with open("file.json", "r") as f:
+            self.assertIn(bmid, f.read())
+
+    def test_save_child_updates_file(self):
+        bm = User()
+        bm.save()
+        bmid = "User." + bm.id
         with open("file.json", "r") as f:
             self.assertIn(bmid, f.read())
 
