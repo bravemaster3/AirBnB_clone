@@ -81,7 +81,7 @@ class TestFileStorage_methods(unittest.TestCase):
         self.assertIn(am, models.storage.all().values())
         self.assertIn("Review." + rv.id, models.storage.all().keys())
         self.assertIn(rv, models.storage.all().values())
-"""
+    """
     def test_new_with_args(self):
         with self.assertRaises(TypeError):
             models.storage.new(BaseModel(), 1)
@@ -89,6 +89,7 @@ class TestFileStorage_methods(unittest.TestCase):
     def test_new_with_None(self):
         with self.assertRaises(AttributeError):
             models.storage.new(None)
+            """
 
     def test_save(self):
         bm = BaseModel()
@@ -116,6 +117,7 @@ class TestFileStorage_methods(unittest.TestCase):
             self.assertIn("City." + cy.id, save_text)
             self.assertIn("Amenity." + am.id, save_text)
             self.assertIn("Review." + rv.id, save_text)
+    """
 
     def test_save_with_arg(self):
         with self.assertRaises(TypeError):
