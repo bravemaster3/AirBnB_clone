@@ -79,6 +79,29 @@ class TestFileStorage(unittest.TestCase):
     def test_reload_empty_json(self):
         """test for trying to reload storage when no json file"""
         self.assertIsNone(storage.reload())
+    
+    class TestFileStorage_methods(unittest.TestCase):
+        """additional tests for save, reload and objects"""
+        @classmethod
+        def setUp(self):
+            try:
+                os.rename("file.json", "my_file")
+            except IOError:
+                pass
+        @classmethod
+        def tearDown(self) -> None:
+            try:
+                os.remove("file.json")
+            except IOError:
+                pass
+            try:
+                os.rename("tmp", "file.json")
+            except IOError:
+                pass
+            file_storage.FileStorage._FileStorage__objects = {}
+        def test_all(self):
+            """Test the the objects data type"""
+            self.assertEqual(type(storage.all(), dict))
 
 
 if __name__ == '__main__':
