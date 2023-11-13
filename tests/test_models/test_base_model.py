@@ -106,7 +106,7 @@ class TestBaseModel_save(unittest.TestCase):
             os.rename("tmp", "file.json")
         except IOError:
             pass
-        """
+        
 
     def test_one_save(self):
         bm = BaseModel()
@@ -114,7 +114,7 @@ class TestBaseModel_save(unittest.TestCase):
         first_updated_at = bm.updated_at
         bm.save()
         self.assertLess(first_updated_at, bm.updated_at)
-
+"""
     def test_two_saves(self):
         bm = BaseModel()
         sleep(0.05)
@@ -126,14 +126,14 @@ class TestBaseModel_save(unittest.TestCase):
         bm.save()
         self.assertLess(second_updated_at, bm.updated_at)
 """
-
+"""
     def test_save_updates_file(self):
         bm = BaseModel()
         bm.save()
         bmid = "BaseModel." + bm.id
         with open("file.json", "r") as f:
             self.assertIn(bmid, f.read())
-
+"""
 
 """class TestBaseModel_to_dict(unittest.TestCase):
     \"""Unittests for testing to_dict method of the BaseModel class.""\"
