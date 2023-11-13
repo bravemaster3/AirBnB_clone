@@ -15,7 +15,7 @@ from models.city import City
 from models.amenity import Amenity
 from models.review import Review
 from models.engine import file_storage
-from models.engine.file_storage import FileStorage
+# from models.engine.file_storage import FileStorage
 from models import storage
 from datetime import datetime
 from io import StringIO
@@ -108,7 +108,7 @@ class TestFileStorage_methods(unittest.TestCase):
             os.rename("tmp", "file.json")
         except IOError:
             pass
-        FileStorage._FileStorage__objects = {}
+        file_storage.FileStorage._FileStorage__objects = {}
     
     """
     def test_all(self):
