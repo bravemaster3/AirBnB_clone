@@ -26,21 +26,21 @@ import sys
 class TestFileStorage(unittest.TestCase):
     """All test cases of BaseModel class"""
     @classmethod
-    def setUp(self):
+    def setUpClass(self):
         try:
-            os.rename("file.json", "tmp")
-        except IOError:
+            os.rename("file.json", "your_json")
+        except Exception:
             pass
 
     @classmethod
     def tearDown(self):
         try:
             os.remove("file.json")
-        except IOError:
+        except Exception:
             pass
         try:
-            os.rename("tmp", "file.json")
-        except IOError:
+            os.rename("your_json", "file.json")
+        except Exception:
             pass
         file_storage.FileStorage._FileStorage__objects = {}
     """ @classmethod
