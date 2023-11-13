@@ -87,16 +87,16 @@ class TestFileStorage(unittest.TestCase):
         """test for trying to reload storage when no json file"""
         self.assertIsNone(storage.reload())
     
-    class TestFileStorage_methods(unittest.TestCase):
-        """additional tests for save, reload and objects"""
-        @classmethod
-        def setUp(self):
+class TestFileStorage_methods(unittest.TestCase):
+    """additional tests for save, reload and objects"""
+    @classmethod
+    def setUp(self):
             try:
                 os.rename("file.json", "my_file")
             except IOError:
                 pass
-        @classmethod
-        def tearDown(self) -> None:
+    @classmethod
+    def tearDown(self):
             try:
                 os.remove("file.json")
             except IOError:
@@ -107,7 +107,7 @@ class TestFileStorage(unittest.TestCase):
                 pass
             file_storage.FileStorage._FileStorage__objects = {}
         
-        def test_new(self):
+    def test_new(self):
             """Test the .new() method"""
             my_bm = BaseModel()
             my_us = User()
@@ -121,7 +121,7 @@ class TestFileStorage(unittest.TestCase):
             self.assertIn(my_us, models.storage.all().values())
             
 
-        def test_save(self):
+    def test_save(self):
             """Test the .save() method"""
             my_bm = BaseModel()
             my_us = User()
