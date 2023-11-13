@@ -27,21 +27,24 @@ class TestFileStorage(unittest.TestCase):
     """All test cases of BaseModel class"""
     @classmethod
     def setUpClass(self):
+        stor_path = "file.json"
+        """Preserve existing test file.json
+        if any"""
         try:
-            os.rename("file.json", "your_json")
+            os.rename(stor_path, "your_json")
         except Exception:
             pass
 
     @classmethod
     def tearDown(self):
-        try:
-            os.remove("file.json")
-        except Exception:
-            pass
-        try:
-            os.rename("your_json", "file.json")
-        except Exception:
-            pass
+        """Delete unit test json and restore previous
+        Reset __objects"""
+        stor_path = "file.json"
+        if os.path.exists(stor_path):
+            os.remove(stor_path)
+        if os.path.exists("your_json"):
+            os.rename("your_json", stor_path)
+        
         file_storage.FileStorage._FileStorage__objects = {}
     """ @classmethod
     def setUpClass(cls):
