@@ -132,7 +132,7 @@ class HBNBCommand(cmd.Cmd):
             if data_type and data_type == int:
                 try:
                     return data_type(float(value))
-                except:
+                except Exception:
                     pass
             elif not data_type:
                 return value
