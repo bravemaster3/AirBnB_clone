@@ -129,17 +129,17 @@ class TestFileStorage_methods(unittest.TestCase):
         cy = City()
         am = Amenity()
         rv = Review()"""
-        models.storage.new(bm)
-        models.storage.new(us)
+        storage.new(bm)
+        storage.new(us)
         """models.storage.new(st)
         models.storage.new(pl)
         models.storage.new(cy)
         models.storage.new(am)
         models.storage.new(rv)"""
-        self.assertIn("BaseModel." + bm.id, models.storage.all().keys())
-        self.assertIn(bm, models.storage.all().values())
-        self.assertIn("User." + us.id, models.storage.all().keys())
-        self.assertIn(us, models.storage.all().values())
+        self.assertIn("BaseModel." + bm.id, storage.all().keys())
+        self.assertIn(bm, storage.all().values())
+        self.assertIn("User." + us.id, storage.all().keys())
+        self.assertIn(us, storage.all().values())
         """self.assertIn("State." + st.id, models.storage.all().keys())
         self.assertIn(st, models.storage.all().values())
         self.assertIn("Place." + pl.id, models.storage.all().keys())
@@ -168,14 +168,14 @@ class TestFileStorage_methods(unittest.TestCase):
         cy = City()
         am = Amenity()
         rv = Review()"""
-        models.storage.new(bm)
+        storage.new(bm)
         """models.storage.new(us)
         models.storage.new(st)
         models.storage.new(pl)
         models.storage.new(cy)
         models.storage.new(am)
         models.storage.new(rv)"""
-        models.storage.save()
+        storage.save()
         save_text = ""
         with open("file.json", "r") as f:
             save_text = f.read()
