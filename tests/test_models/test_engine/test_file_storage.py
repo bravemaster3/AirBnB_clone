@@ -80,25 +80,38 @@ class TestFileStorage(unittest.TestCase):
         """test for trying to reload storage when no json file"""
         self.assertIsNone(storage.reload())
 
-    def test_child_new(self):
-        """Test new using subclass"""
-        """all_objs = storage.all()
-        key = f"BaseModel.{obj2.id}"
-        self.assertTrue(key in all_objs)"""
+    """def test_child_new(self):
         us = User()
         # storage.new(us)
         self.assertIn("User." + us.id, storage.all().keys())
-        self.assertIn(us, storage.all().values())
+        self.assertIn(us, storage.all().values())"""
+    def test_child_storage_new(self):
+        """testing addition of a new subclass object to the storage"""
+        obj3 = User()
+        all_objs = storage.all()
+        key = f"User.{obj3.id}"
+        self.assertTrue((key, obj3) in all_objs.items())
 
-    def test_child_save(self):
-        """Test save using subclass"""
+    """def test_child_save(self):
+        
         us = User()
         storage.new(us)
         storage.save()
         save_text = ""
         with open("file.json", "r") as f:
             save_text = f.read()
-            self.assertIn("User." + us.id, save_text)
+            self.assertIn("User." + us.id, save_text)"""
+    def test_child_save_reload(self):
+        """testing save and reload methods"""
+        obj3 = User()
+        storage.save()
+        self.assertTrue(os.path.isfile("file.json"))
+        all_objs = storage.all()
+        expected = {k: v.to_dict() for k, v in all_objs.items()}
+        with open("file.json") as f:
+            output = json.load(f)
+        self.maxDiff = None
+        self.assertEqual(output, expected)
 
 
 
