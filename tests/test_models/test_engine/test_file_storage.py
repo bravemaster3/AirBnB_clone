@@ -26,8 +26,26 @@ import sys
 class TestFileStorage(unittest.TestCase):
     """All test cases of BaseModel class"""
     @classmethod
+    def setUp(self):
+        try:
+            os.rename("file.json", "tmp")
+        except IOError:
+            pass
+
+    @classmethod
+    def tearDown(self):
+        try:
+            os.remove("file.json")
+        except IOError:
+            pass
+        try:
+            os.rename("tmp", "file.json")
+        except IOError:
+            pass
+        file_storage.FileStorage._FileStorage__objects = {}
+    """ @classmethod
     def setUpClass(cls):
-        """removing file.json to start from empty"""
+        \"""removing file.json to start from empty""\"
         # reload(base_model)
         stor_path = "file.json"
         with open(stor_path, "w") as f:
@@ -38,24 +56,24 @@ class TestFileStorage(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        """removing file.json that has been created
-        and manipulated in these tests"""
+         \"""removing file.json that has been created
+        and manipulated in these tests""\"
         stor_path = "file.json"
         if os.path.exists(stor_path):
-            os.remove(stor_path)
+            os.remove(stor_path)"""
 
     def setUp(self):
         """creating a BaseModel before each test case"""
         self.obj = BaseModel()
 
-    def tearDown(self):
-        """Instructions to do after each test"""
+    """def tearDown(self):
+        \"""Instructions to do after each test""\"
         stor_path = "file.json"
         with open(stor_path, "w") as f:
             f.write("{}")
         storage.reload()
         if os.path.exists(stor_path):
-            os.remove(stor_path)
+            os.remove(stor_path)"""
 
     def test_attr_types(self):
         """testing the type of Filestorage private attributes"""
