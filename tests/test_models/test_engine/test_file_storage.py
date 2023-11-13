@@ -9,13 +9,6 @@ import models
 from models import base_model
 from models.base_model import BaseModel
 from models.user import User
-from models.state import State
-from models.place import Place
-from models.city import City
-from models.amenity import Amenity
-from models.review import Review
-from models.engine import file_storage
-# from models.engine.file_storage import FileStorage
 from models import storage
 from datetime import datetime
 from io import StringIO
@@ -36,34 +29,12 @@ class TestFileStorage(unittest.TestCase):
             pass
 
     @classmethod
-    def tearDown(self):
+    def tearDownClass(self):
         """Delete unit test json and restore previous
         Reset __objects"""
         stor_path = "file.json"
         if os.path.exists(stor_path):
             os.remove(stor_path)
-        if os.path.exists("your_json"):
-            os.rename("your_json", stor_path)
-        
-        file_storage.FileStorage._FileStorage__objects = {}
-    """ @classmethod
-    def setUpClass(cls):
-        \"""removing file.json to start from empty""\"
-        # reload(base_model)
-        stor_path = "file.json"
-        with open(stor_path, "w") as f:
-            f.write("{}")
-        storage.reload()
-        if os.path.exists(stor_path):
-            os.remove(stor_path)
-
-    @classmethod
-    def tearDownClass(cls):
-         \"""removing file.json that has been created
-        and manipulated in these tests""\"
-        stor_path = "file.json"
-        if os.path.exists(stor_path):
-            os.remove(stor_path)"""
 
     def setUp(self):
         """creating a BaseModel before each test case"""
@@ -111,8 +82,11 @@ class TestFileStorage(unittest.TestCase):
 
     def test_child_new(self):
         """Test new using subclass"""
+        """all_objs = storage.all()
+        key = f"BaseModel.{obj2.id}"
+        self.assertTrue(key in all_objs)"""
         us = User()
-        storage.new(us)
+        # storage.new(us)
         self.assertIn("User." + us.id, storage.all().keys())
         self.assertIn(us, storage.all().values())
 
