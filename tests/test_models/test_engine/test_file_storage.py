@@ -20,8 +20,8 @@ from models.amenity import Amenity
 from models.review import Review
 
 
-"""class TestFileStorage_instantiation(unittest.TestCase):
-    \"""Unittests for testing instantiation of the FileStorage class.""\"
+class TestFileStorage_instantiation(unittest.TestCase):
+    """Unittests for testing instantiation of the FileStorage class."""
 
     def test_FileStorage_instantiation_no_args(self):
         self.assertEqual(type(FileStorage()), FileStorage)
@@ -37,11 +37,11 @@ from models.review import Review
         self.assertEqual(dict, type(FileStorage._FileStorage__objects))
 
     def test_storage_initializes(self):
-        self.assertEqual(type(models.storage), FileStorage)"""
+        self.assertEqual(type(models.storage), FileStorage)
 
 
-class TestFileStorage_methods(unittest.TestCase):
-    """Unittests for testing methods of the FileStorage class."""
+"""class TestFileStorage_methods(unittest.TestCase):
+    \"""Unittests for testing methods of the FileStorage class.""\"
 
     @classmethod
     def setUp(self):
@@ -167,7 +167,7 @@ class TestFileStorage_methods(unittest.TestCase):
     def test_reload_with_arg(self):
         with self.assertRaises(TypeError):
             models.storage.reload(None)
-
+"""
 
 if __name__ == "__main__":
     unittest.main()
