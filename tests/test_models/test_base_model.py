@@ -106,15 +106,8 @@ class TestBaseModel_save(unittest.TestCase):
             os.rename("tmp", "file.json")
         except IOError:
             pass
-        
 
-    def test_one_save(self):
-        bm = BaseModel()
-        sleep(0.05)
-        first_updated_at = bm.updated_at
-        bm.save()
-        self.assertLess(first_updated_at, bm.updated_at)
-"""
+
     def test_two_saves(self):
         bm = BaseModel()
         sleep(0.05)
@@ -125,7 +118,7 @@ class TestBaseModel_save(unittest.TestCase):
         sleep(0.05)
         bm.save()
         self.assertLess(second_updated_at, bm.updated_at)
-"""
+
 """
     def test_save_updates_file(self):
         bm = BaseModel()
