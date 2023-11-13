@@ -101,7 +101,10 @@ class TestFileStorage(unittest.TestCase):
             file_storage.FileStorage._FileStorage__objects = {}
         def test_all(self):
             """Test the the objects data type"""
-            self.assertEqual(type(storage.all(), dict))
+            self.assertEqual(type(storage.all()), dict)
+        def test_objects(self):
+            """Test the the objects data type"""
+            self.assertEqual(type(file_storage.FileStorage.__objects), dict)
 
 
 if __name__ == '__main__':
