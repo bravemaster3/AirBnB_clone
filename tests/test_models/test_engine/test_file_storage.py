@@ -66,14 +66,14 @@ class TestFileStorage(unittest.TestCase):
         """creating a BaseModel before each test case"""
         self.obj = BaseModel()
 
-    """def tearDown(self):
-        \"""Instructions to do after each test""\"
+    def tearDown(self):
+        """Instructions to do after each test"""
         stor_path = "file.json"
         with open(stor_path, "w") as f:
             f.write("{}")
         storage.reload()
         if os.path.exists(stor_path):
-            os.remove(stor_path)"""
+            os.remove(stor_path)
 
     def test_attr_types(self):
         """testing the type of Filestorage private attributes"""
