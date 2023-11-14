@@ -1,40 +1,38 @@
 #!/usr/bin/python3
-"""
-Unittest class for base_model
-"""
+"""Defines unittests for models/engine/file_storage.py.
 
+Unittest classes:
+    TestFileStorage_instantiation
+    TestFileStorage_methods
+"""
 import os
+import json
+import models
 import unittest
+from datetime import datetime
 from models.base_model import BaseModel
+from models import storage
 from models.engine import file_storage
 from models.user import User
-from models import storage
-import json
 
 
-class TestFileStorage(unittest.TestCase):
-    """All test cases of BaseModel class"""
+class TestFileStorage_methods(unittest.TestCase):
+    """Unittests for testing methods of the FileStorage class."""
+
     @classmethod
-    def setUpClass(self):
-        stor_path = "file.json"
-        """Preserve existing test file.json
-        if any"""
+    def setUp(self):
         try:
-            os.rename(stor_path, "your_json")
-        except Exception:
+            os.rename("file.json", "tmp")
+        except IOError:
             pass
 
     @classmethod
-    def tearDownClass(self):
-        """Delete unit test json and restore previous
-        Reset __objects"""
-        stor_path = "file.json"
-        if os.path.exists(stor_path):
-            os.remove(stor_path)
+    def tearDown(self):
         try:
-            os.rename("your_json", stor_path)
-        except Exception:
+            os.remove("file.json")
+        except IOError:
             pass
+
         file_storage.FileStorage._FileStorage__objects = {}
 
     def setUp(self):
@@ -46,7 +44,7 @@ class TestFileStorage(unittest.TestCase):
         stor_path = "file.json"
         with open(stor_path, "w") as f:
             f.write("{}")
-        storage.reload()
+        # storage.reload()
         if os.path.exists(stor_path):
             os.remove(stor_path)
 
