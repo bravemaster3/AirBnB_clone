@@ -20,14 +20,14 @@ class TestFileStorage_methods(unittest.TestCase):
     """Unittests for testing methods of the FileStorage class."""
 
     @classmethod
-    def setUp(self):
+    def setUpClass(self):
         try:
             os.rename("file.json", "tmp")
         except IOError:
             pass
 
     @classmethod
-    def tearDown(self):
+    def tearDownClass(self):
         try:
             os.remove("file.json")
         except IOError:
@@ -44,7 +44,8 @@ class TestFileStorage_methods(unittest.TestCase):
         stor_path = "file.json"
         with open(stor_path, "w") as f:
             f.write("{}")
-        # storage.reload()
+        storage.reload()
+        file_storage.FileStorage._FileStorage__objects = {}
         if os.path.exists(stor_path):
             os.remove(stor_path)
 
