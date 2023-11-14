@@ -11,6 +11,7 @@ import models
 import unittest
 from datetime import datetime
 from models.base_model import BaseModel
+from models import storage
 from models.engine import file_storage
 from models.user import User
 
