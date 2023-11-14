@@ -61,17 +61,13 @@ class TestFileStorage_methods(unittest.TestCase):
         In parent and subclass"""
         obj2 = BaseModel()
         obj3 = User()
-        # storage.new(obj3)
         all_objs = storage.all()
-        # print(all_objs)
         key2 = f"BaseModel.{obj2.id}"
         key3 = f"User.{obj3.id}"
         with self.subTest():
-            self.assertTrue(key2 in all_objs)
-            # print(key3 in all_objs)
+            self.assertTrue((key2, obj2) in all_objs.items())
         with self.subTest():
-            self.assertTrue(key2, all_objs)
-            # print(key3 in all_objs)
+            self.assertTrue((key3, obj3) in all_objs.items())
 
     def test_storage_save_reload(self):
         """testing save and reload methods
