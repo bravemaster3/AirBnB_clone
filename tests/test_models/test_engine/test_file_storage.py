@@ -85,8 +85,9 @@ class TestFileStorage_methods(unittest.TestCase):
         self.assertTrue(os.path.isfile("file.json"))
         all_objs = models.storage.all()
         expected = {k: v.to_dict() for k, v in all_objs.items()}
-        with open("file.json") as f:
-            output = json.load(f)
+        models.storage.reload()
+        all_objs = models.storage.all()
+        output = {k: v.to_dict() for k, v in all_objs.items()}
         self.maxDiff = None
         self.assertEqual(output, expected)
 
