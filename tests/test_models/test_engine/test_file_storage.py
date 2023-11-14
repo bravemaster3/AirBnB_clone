@@ -86,10 +86,14 @@ class TestFileStorage_methods(unittest.TestCase):
         all_objs = models.storage.all()
         expected = {k: v.to_dict() for k, v in all_objs.items()}
         models.storage.reload()
-        all_objs = file_storage.FileStorage._FileStorage__objects
-        output = {k: v.to_dict() for k, v in all_objs.items()}
-        self.maxDiff = None
-        self.assertEqual(output, expected)        
+        all_objs = models.storage.all()
+        with self.subTest():
+            output = {k: v.to_dict() for k, v in all_objs.items()}
+            self.maxDiff = None
+            self.assertEqual(output, expected)
+        with self.subTest():
+            objs = file_storage.FileStorage._FileStorage__objects
+            self.assertNotEqual(all_objs, objs)        
 
     def test_reload_empty_json(self):
         """test for trying to reload storage when no json file"""
