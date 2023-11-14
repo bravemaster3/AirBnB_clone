@@ -1,40 +1,38 @@
 #!/usr/bin/python3
-"""
-Unittest class for base_model
-"""
+"""Defines unittests for models/engine/file_storage.py.
 
+Unittest classes:
+    TestFileStorage_instantiation
+    TestFileStorage_methods
+"""
 import os
+import json
+import models
 import unittest
-from models import base_model
+from datetime import datetime
 from models.base_model import BaseModel
 from models.engine import file_storage
-from models import storage
-from datetime import datetime
-from io import StringIO
-import json
-import sys
+from models.user import User
 
 
-class TestFileStorage(unittest.TestCase):
-    """All test cases of BaseModel class"""
-    @classmethod
-    def setUpClass(cls):
-        """removing file.json to start from empty"""
-        # reload(base_model)
-        stor_path = "file.json"
-        with open(stor_path, "w") as f:
-            f.write("{}")
-        storage.reload()
-        if os.path.exists(stor_path):
-            os.remove(stor_path)
+class TestFileStorage_methods(unittest.TestCase):
+    """Unittests for testing methods of the FileStorage class."""
 
     @classmethod
-    def tearDownClass(cls):
-        """removing file.json that has been created
-        and manipulated in these tests"""
-        stor_path = "file.json"
-        if os.path.exists(stor_path):
-            os.remove(stor_path)
+    def setUp(self):
+        try:
+            os.rename("file.json", "tmp")
+        except IOError:
+            pass
+
+    @classmethod
+    def tearDown(self):
+        try:
+            os.remove("file.json")
+        except IOError:
+            pass
+
+        file_storage.FileStorage._FileStorage__objects = {}
 
     def setUp(self):
         """creating a BaseModel before each test case"""
@@ -59,14 +57,22 @@ class TestFileStorage(unittest.TestCase):
         self.assertEqual(my_dict, all_objs)
 
     def test_storage_new(self):
-        """testing addition of a new object to the storage"""
+        """testing addition of a new object to the storage
+        In parent and subclass"""
         obj2 = BaseModel()
+        obj3 = User()
         all_objs = storage.all()
-        key = f"BaseModel.{obj2.id}"
-        self.assertTrue(key in all_objs)
+        key2 = f"BaseModel.{obj2.id}"
+        key3 = f"User.{obj3.id}"
+        with self.subTest():
+            self.assertTrue((key2, obj2) in all_objs.items())
+        with self.subTest():
+            self.assertTrue((key3, obj3) in all_objs.items())
 
     def test_storage_save_reload(self):
-        """testing save and reload methods"""
+        """testing save and reload methods
+        in parent and subclass"""
+        obj2 = User()
         storage.save()
         self.assertTrue(os.path.isfile("file.json"))
         all_objs = storage.all()
