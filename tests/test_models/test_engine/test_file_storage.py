@@ -33,7 +33,6 @@ class TestFileStorage_methods(unittest.TestCase):
         except IOError:
             pass
 
-        # storage.__objects = {}
         file_storage.FileStorage._FileStorage__objects = {}
 
     def setUp(self):
@@ -45,7 +44,7 @@ class TestFileStorage_methods(unittest.TestCase):
         stor_path = "file.json"
         with open(stor_path, "w") as f:
             f.write("{}")
-        storage.reload()
+        # storage.reload()
         if os.path.exists(stor_path):
             os.remove(stor_path)
 
