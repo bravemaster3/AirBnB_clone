@@ -119,12 +119,12 @@ class TestBaseModel(unittest.TestCase):
         obj3 = BaseModel(**{})
         self.assertTrue(hasattr(obj3, "id"))
 
-    """def test_child_save(self):
-        \"""Test subclass save method""\"
+    def test_child_save(self):
+        """Test subclass save method"""
         obj4 = User()
         obj4.save()
         with open("file.json") as f:
-            self.assertIn("User." + obj4.id, f.read())"""
+            self.assertIn("User." + obj4.id, f.read())
 
 
 if __name__ == '__main__':
