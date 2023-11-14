@@ -33,7 +33,7 @@ class TestFileStorage_methods(unittest.TestCase):
         except IOError:
             pass
 
-        storage.__objects = {}
+        # storage.__objects = {}
         file_storage.FileStorage._FileStorage__objects = {}
 
     def setUp(self):
