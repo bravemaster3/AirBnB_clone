@@ -51,13 +51,13 @@ class TestFileStorage_methods(unittest.TestCase):
         stor_path = "file.json"
         with open(stor_path, "w") as f:
             f.write("{}")
-        storage.reload()
+        models.storage.reload()
         if os.path.exists(stor_path):
             os.remove(stor_path)
 
     def test_attr_types(self):
         """testing the type of Filestorage private attributes"""
-        all_objs = storage.all()
+        all_objs = models.storage.all()
         self.assertIsNotNone(all_objs)
         my_dict = {
             f'{self.obj.__class__.__name__}.{self.obj.id}': self.obj}
@@ -69,7 +69,7 @@ class TestFileStorage_methods(unittest.TestCase):
         In parent and subclass"""
         obj2 = BaseModel()
         obj3 = User()
-        all_objs = storage.all()
+        all_objs = models.storage.all()
         key2 = f"BaseModel.{obj2.id}"
         key3 = f"User.{obj3.id}"
         with self.subTest():
@@ -81,9 +81,9 @@ class TestFileStorage_methods(unittest.TestCase):
         """testing save and reload methods
         in parent and subclass"""
         obj2 = User()
-        storage.save()
+        models.storage.save()
         self.assertTrue(os.path.isfile("file.json"))
-        all_objs = storage.all()
+        all_objs = models.storage.all()
         expected = {k: v.to_dict() for k, v in all_objs.items()}
         with open("file.json") as f:
             output = json.load(f)
@@ -92,7 +92,7 @@ class TestFileStorage_methods(unittest.TestCase):
 
     def test_reload_empty_json(self):
         """test for trying to reload storage when no json file"""
-        self.assertIsNone(storage.reload())
+        self.assertIsNone(models.storage.reload())
 
 
 if __name__ == '__main__':
