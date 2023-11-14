@@ -12,7 +12,7 @@ import unittest
 from datetime import datetime
 from models.base_model import BaseModel
 from models import storage
-from models.engine import file_storage
+# from models.engine import file_storage
 from models.user import User
 
 
@@ -33,7 +33,8 @@ class TestFileStorage_methods(unittest.TestCase):
         except IOError:
             pass
 
-        file_storage.FileStorage._FileStorage__objects = {}
+        storage.__objects = {}
+        # file_storage.FileStorage._FileStorage__objects = {}
 
     def setUp(self):
         """creating a BaseModel before each test case"""
