@@ -5,15 +5,10 @@ Unittest class for base_model
 
 import os
 import unittest
-import models
-from models import base_model
 from models.base_model import BaseModel
 from models.user import User
 from models import storage
-from datetime import datetime
-from io import StringIO
 import json
-import sys
 
 
 class TestFileStorage(unittest.TestCase):
@@ -59,7 +54,8 @@ class TestFileStorage(unittest.TestCase):
         self.assertEqual(my_dict, all_objs)
 
     def test_storage_new(self):
-        """testing addition of a new object to the storage"""
+        """testing addition of a new object to the storage
+        In parent and subclass"""
         obj2 = BaseModel()
         obj3 = User()
         all_objs = storage.all()
@@ -68,10 +64,11 @@ class TestFileStorage(unittest.TestCase):
         with self.subTest():
             self.assertTrue((key, obj2) in all_objs.items())
         with self.subTest():
-            self.assertTrue((key, obj3) in all_objs.items())
+            self.assertTrue((key2, obj3) in all_objs.items())
 
     def test_storage_save_reload(self):
-        """testing save and reload methods"""
+        """testing save and reload methods
+        in parent and subclass"""
         obj2 = User()
         storage.save()
         self.assertTrue(os.path.isfile("file.json"))
@@ -85,38 +82,6 @@ class TestFileStorage(unittest.TestCase):
     def test_reload_empty_json(self):
         """test for trying to reload storage when no json file"""
         self.assertIsNone(storage.reload())
-
-    """def test_child_new(self):
-        us = User()
-        # storage.new(us)
-        self.assertIn("User." + us.id, storage.all().keys())
-        self.assertIn(us, storage.all().values())
-    def test_child_storage_new(self):
-        obj3 = User()
-        all_objs = storage.all()
-        key = f"User.{obj3.id}"
-        self.assertTrue((key, obj3) in all_objs.items())"""
-
-    """def test_child_save(self):
-        
-        us = User()
-        storage.new(us)
-        storage.save()
-        save_text = ""
-        with open("file.json", "r") as f:
-            save_text = f.read()
-            self.assertIn("User." + us.id, save_text)
-    def test_child_save_reload(self):
-        obj3 = User()
-        storage.save()
-        self.assertTrue(os.path.isfile("file.json"))
-        all_objs = storage.all()
-        expected = {k: v.to_dict() for k, v in all_objs.items()}
-        with open("file.json") as f:
-            output = json.load(f)
-        self.maxDiff = None
-        self.assertEqual(output, expected)"""
-
 
 
 if __name__ == '__main__':
