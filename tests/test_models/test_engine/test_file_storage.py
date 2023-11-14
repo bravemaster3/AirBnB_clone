@@ -6,6 +6,7 @@ Unittest class for base_model
 import os
 import unittest
 from models.base_model import BaseModel
+from models.engine import file_storage
 from models.user import User
 from models import storage
 import json
@@ -34,6 +35,7 @@ class TestFileStorage(unittest.TestCase):
             os.rename("your_json", stor_path)
         except Exception:
             pass
+        file_storage.FileStorage._FileStorage__objects = {}
 
     def setUp(self):
         """creating a BaseModel before each test case"""
