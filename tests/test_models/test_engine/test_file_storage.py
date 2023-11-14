@@ -45,7 +45,6 @@ class TestFileStorage_methods(unittest.TestCase):
         with open(stor_path, "w") as f:
             f.write("{}")
         storage.reload()
-        file_storage.FileStorage._FileStorage__objects = {}
         if os.path.exists(stor_path):
             os.remove(stor_path)
 
