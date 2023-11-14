@@ -19,17 +19,28 @@ from models.user import User
 class TestFileStorage_methods(unittest.TestCase):
     """Unittests for testing methods of the FileStorage class."""
 
+
+class TestFileStorage_methods(unittest.TestCase):
+    """Unittests for testing methods of the FileStorage class."""
+
     @classmethod
-    def setUpClass(self):
+    def setUp(self):
+        """Rename existing file.json"""
         try:
             os.rename("file.json", "tmp")
         except IOError:
             pass
 
     @classmethod
-    def tearDownClass(self):
+    def tearDown(self):
+        """Remove unittest file.json and restore
+        previous"""
         try:
             os.remove("file.json")
+        except IOError:
+            pass
+        try:
+            os.rename("tmp", "file.json")
         except IOError:
             pass
 
