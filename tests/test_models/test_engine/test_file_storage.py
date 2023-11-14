@@ -67,7 +67,7 @@ class TestFileStorage(unittest.TestCase):
             self.assertTrue(key2 in all_objs)
             # print(key3 in all_objs)
         with self.subTest():
-            self.assertIn(key2, all_objs)
+            self.assertTrue(key2, all_objs)
             # print(key3 in all_objs)
 
     def test_storage_save_reload(self):
