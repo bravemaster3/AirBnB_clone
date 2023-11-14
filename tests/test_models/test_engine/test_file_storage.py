@@ -19,10 +19,6 @@ from models.user import User
 class TestFileStorage_methods(unittest.TestCase):
     """Unittests for testing methods of the FileStorage class."""
 
-
-class TestFileStorage_methods(unittest.TestCase):
-    """Unittests for testing methods of the FileStorage class."""
-
     @classmethod
     def setUp(self):
         """Rename existing file.json"""
