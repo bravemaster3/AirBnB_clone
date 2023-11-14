@@ -20,14 +20,14 @@ class TestFileStorage_methods(unittest.TestCase):
     """Unittests for testing methods of the FileStorage class."""
 
     @classmethod
-    def setUpClass(self):
+    def setUp(self):
         try:
             os.rename("file.json", "tmp")
         except IOError:
             pass
 
     @classmethod
-    def tearDownClass(self):
+    def tearDown(self):
         try:
             os.remove("file.json")
         except IOError:
