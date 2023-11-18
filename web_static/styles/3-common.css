@@ -1,0 +1,8 @@
+/* CSS for the body elements */
+body {
+    margin: 0;
+    padding: 0;
+    color: #484848;
+    font-size: 14 px;
+    font-family: Circular, "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
