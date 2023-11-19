@@ -1,4 +1,5 @@
 /* Styles for the filters */
+
 .filters {
     background-color: white;
     height: 70px;
@@ -50,10 +51,13 @@
 
 .popover {
     background-color: #FAFAFA;
-    margin-left: -40px;
     border: 1px solid #DDDDDD;
     border-radius: 4px;
     opacity: 0;
+    position: relative;
+    width: calc(100% + 40px);
+    margin-left: -40px;
+    pointer-events: none;
 }
 
 .popover ul {

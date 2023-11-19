@@ -1,6 +1,6 @@
 /* Styles for places */
 
-.places .articles-div {
+.articles-div {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
@@ -8,6 +8,8 @@
 
 .places h1 {
     font-size: 30px;
+    margin-bottom: 0;
+    padding-left: 10px;
 }
 
 .places article {
