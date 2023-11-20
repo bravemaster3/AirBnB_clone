@@ -26,24 +26,25 @@
     opacity: 0.9;
 }
 
-.locations, .amenities {
+.locations-filter,
+.amenities-filter {
     height: 100%;
     width: 25%;
     padding-left: 40px;
 }
 
-.locations {
+.locations-filter {
     border-right: 1px solid #DDDDDD;
 }
 
-.locations h3,
-.amenities h3 {
+.locations-filter h3,
+.amenities-filter h3 {
     font-weight: 600;
     margin-bottom: 0;
 }
 
-.locations h4,
-.amenities h4 {
+.locations-filter h4,
+.amenities-filter h4 {
     margin-top: 0;
     font-weight: 400;
     font-size: 14px;
@@ -74,7 +75,7 @@
     list-style-type: none;
 }
 
-.locations:hover > .popover,
-.amenities:hover > .popover {
+.locations-filter:hover > .popover,
+.amenities-filter:hover > .popover {
     opacity: 1;
 }

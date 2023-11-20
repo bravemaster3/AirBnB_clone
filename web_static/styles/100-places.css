@@ -96,3 +96,67 @@
     padding-top: 20px;
     text-align: left;
 }
+
+.amenities {
+    margin-top: 40px;
+    padding-left: 0px;
+    width: 100%;
+    text-align: left;
+}
+
+.amenities h2 {
+    font-size: 16px;
+    text-align: left;
+    border-bottom: 1px solid #DDDDDD;
+}
+
+.amenities ul,
+.amenities li {
+    list-style-type: none;
+    padding-left: 0px;
+    margin-top: 10px;
+}
+
+.amenities p {
+    padding-left: 30px;
+}
+
+.tv-icon {
+    background: no-repeat url(../images/icon_tv.png);
+    background-size: 15px;
+}
+
+.wifi-icon {
+    background: no-repeat url(../images/icon_wifi.png);
+    background-size: 15px;
+}
+
+.pet-icon {
+    background: no-repeat url(../images/icon_pets.png);
+    background-size: 15px;
+}
+
+.reviews {
+    margin-top: 40px;
+    text-align: left;
+}
+
+.reviews h2 {
+    font-size: 16px;
+    margin-top: 0px;
+    border-bottom: 1px solid #DDDDDD;
+}
+
+.reviews ul {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+.reviews h3 {
+    font-size: 14px;
+    margin-bottom: 2px;
+}
+
+.reviews p {
+    font-size: 12px;
+}
