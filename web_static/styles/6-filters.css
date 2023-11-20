@@ -58,6 +58,7 @@
     width: calc(100% + 40px);
     margin-left: -40px;
     pointer-events: none;
+    z-index: 100;
 }
 
 .popover ul {

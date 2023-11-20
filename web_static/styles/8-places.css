@@ -68,24 +68,27 @@
 .max_guest > p,
 .number_rooms > p,
 .number_bathrooms > p {
-    top: 60px;
+    top: 55px;
     position: relative;
     justify-content: center;
 }
 
 .max_guest {
     background: no-repeat url("../images/icon_group.png");
-    background-position: center;
+    background-position-x: center;
+    background-position-y: calc(50% - 10px);
 }
 
 .number_rooms {
     background: no-repeat url("../images/icon_bed.png");
-    background-position: center;
+    background-position-x: center;
+    background-position-y: calc(50% - 10px);
 }
 
 .number_bathrooms {
     background: no-repeat url("../images/icon_bath.png");
-    background-position: center;
+    background-position-x: center;
+    background-position-y: calc(50% - 10px);
 }
 
 .user {
